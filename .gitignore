@@ -2,7 +2,7 @@
 
 # dependencies
 /node_modules
-.next/
+
 /.pnp
 .pnp.*
 .yarn/*
@@ -40,3 +40,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+ 
+# Ignore all files in upload/thumbnail but keep the directory
+public/upload/thumbnail/*
+!public/upload/thumbnail/.gitkeep

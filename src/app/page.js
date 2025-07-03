@@ -1,11 +1,10 @@
 import Image from "next/image";
 import LogoutButton from "@/components/buttons/logout-button";
+import BlogList from "@/components/blog-feed/blog-list";
 export default function Home() {
   return (
     <>
-    <h1>Home Page</h1>
-    <LogoutButton/>
-    
+    <BlogList/>
     </>
   );
 }

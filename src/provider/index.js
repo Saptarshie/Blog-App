@@ -6,7 +6,8 @@ export default function ReduxProvider({ children }) {
   return (
     <Provider store={store}>
         <Navbar/>
-        <main className="pt-[60px]">
+        <div className="h-14"/>
+        <main>
         {children}
         </main>
     </Provider>

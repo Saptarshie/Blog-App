@@ -174,7 +174,16 @@ export async function RegisterCreatorAction(data){
         }
         const decoded = jwt.verify(token, process.env.JWT_SECRET||"secret");
         // console.log(decoded);
-        const user = await User.findByIdAndUpdate(decoded.id,{$set:{subscriberCount: Math.max(0,user.subscriberCount),walletAddress: data}},{new: true});
+        // Declare user before using it
+        var user = await User.findById(decoded.id);
+        if (!user) {
+            return {
+                success: false,
+                status: 404,
+                message: "User not found",
+            }
+        }
+        user = await User.findByIdAndUpdate(decoded.id,{$set:{subscriberCount: Math.max(0,user.subscriberCount),walletAddress: data}},{new: true});
         if (!user) {
             return {
                 success: false,

@@ -2,27 +2,35 @@
 import { useState } from 'react';
 import { AddBlog } from '@/action/blogAction';
 import { useRouter } from 'next/navigation';
-// import dynamic from 'next/dynamic';
-import 'react-quill/dist/quill.snow.css';
-// import RichTextEditor from '@/components/editor/rich-text-editor'
-import SafeEditor from '@/components/editor/safe-editor';
-// Import React Quill dynamically to avoid SSR issues
-// const ReactQuill = dynamic(() => import('react-quill'), { ssr: false,
-//    loading: () => <p>Loading editor...</p>
-//  });
+import TipTapEditor from '@/components/editor/tip-tap-editor';
+import { useEffect } from 'react';
 
-export default function CreateBlog() {
+export default function CreateBlog({initialData={
+  title: '',
+  description: '',
+  content: '',
+  tags: '',
+  isPremium: false,
+  image: null
+}}
+  ) {
+useEffect(() => {
+  // Set preview image when initialData is provided for editing
+  if (initialData?.image) {
+    setPreview(initialData.image);
+  }
+}, [initialData]);
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [formData, setFormData] = useState({
-    title: '',
-    description: '',
-    content: '',
-    tags: '',
-    isPremium: false,
-    image: null
+    title: initialData.title || '',
+    description: initialData.description || '',
+    content: initialData.content || '',
+    tags:initialData?.tags ? initialData.tags.join(', ') : '',
+    isPremium: initialData.isPremium || false,
+    image: initialData.image || null
   });
   const [preview, setPreview] = useState(null);
 
@@ -30,7 +38,7 @@ export default function CreateBlog() {
     const { name, value, type, checked } = e.target;
     setFormData({
       ...formData,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: type === 'checkbox' ? checked : value,
     });
   };
 
@@ -55,7 +63,7 @@ export default function CreateBlog() {
     setIsSubmitting(true);
     setError('');
     setSuccess('');
-
+    console.log("handle Subbmit called...");
     try {
       // Convert comma-separated tags to array
       const tagsArray = formData.tags
@@ -70,23 +78,27 @@ export default function CreateBlog() {
         tags: tagsArray,
         isPremium: formData.isPremium,
         image: formData.image,
-        date: new Date()
+        date: new Date(),
+        _id: initialData._id || undefined
       };
-
+      console.log("Inside handle submit tyr block... ,BlogData : ",blogData);
       const response = await AddBlog(blogData);
 
       if (response.success) {
+        console.log("Blog posted successfully...");
         setSuccess('Blog posted successfully!');
         setTimeout(() => {
           router.push('/creator-dashboard');
         }, 1500);
       } else {
         setError(response.message || 'Failed to create blog');
+        console.error("Error is :",response.message);
       }
     } catch (err) {
       setError('An unexpected error occurred. Please try again.');
       console.error(err);
     } finally {
+        console.log("inside finally...")
       setIsSubmitting(false);
     }
   };
@@ -147,30 +159,12 @@ export default function CreateBlog() {
           <label htmlFor="content" className="block text-sm font-medium text-gray-700 mb-1">
             Content <span className="text-red-500">*</span>
           </label>
-          {/* <div className="min-h-[300px]">
-            <ReactQuill 
-              theme="snow"
+          <div className="min-h-[300px]">
+            <TipTapEditor
               value={formData.content}
               onChange={handleContentChange}
-              className="h-64"
-              placeholder="Write your blog content here..."
             />
-          </div> */}
-          {/* ------------------------------------*/}
-            {/* <div className="min-h-[300px]">
-              <RichTextEditor
-                value={formData.content}
-                onChange={handleContentChange}
-              />
-            </div> */}
-          {/* -----------------------------------*/}
-        <div className="min-h-[300px]">
-          <SafeEditor
-            value={formData.content}
-            onChange={handleContentChange}
-          />
-        </div>
-          {/* -----------------------------------*/}
+          </div>
         </div>
         
         {/* Image Upload */}
@@ -194,16 +188,17 @@ export default function CreateBlog() {
               Choose image
             </label>
             <span className="ml-3 text-sm text-gray-500">
-              {formData.image ? formData.image.name : 'No file chosen'}
+              {formData.image ? formData.image.name : (preview ? 'Current image' : 'No file chosen')}
             </span>
           </div>
           
           {preview && (
             <div className="mt-3">
-              <img src={preview} alt="Preview" className="h-40 rounded-md object-cover" />
+              <img src={typeof preview === 'string' ? preview : preview} alt="Preview" className="h-40 rounded-md object-cover" />
             </div>
           )}
         </div>
+
         
         {/* Tags Field */}
         <div>

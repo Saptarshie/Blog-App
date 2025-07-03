@@ -24,7 +24,8 @@ export default function BecomeCreator() {
         try {
             // Update user's wallet address in Redux store
             dispatch(updateUser({ walletAddress , subscriberCount: 0}));
-            await RegisterCreatorAction(walletAddress);
+            const res = await RegisterCreatorAction(walletAddress);
+            console.log("res (Bacome Creator) is: ", res);
             setIsLoading(false);
             router.push("/creator-dashboard");
         } catch (error) {

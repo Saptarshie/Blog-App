@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from 'react';
+import { useState, useEffect,useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import LogoutButton from '../buttons/logout-button';
@@ -26,6 +26,25 @@ export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const router = useRouter();
   const user = useSelector((state) => state.userslice);
+  const menuRef = useRef(null);
+   // Add this effect for click outside detection
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setIsMenuOpen(false);
+      }
+    }
+    
+    // Only add the event listener if the menu is open
+    if (isMenuOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    
+    // Clean up the event listener
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isMenuOpen]);
   console.log("User is : ",user);
   // Handle scroll effect
   useEffect(() => {
@@ -100,9 +119,9 @@ export default function Navbar() {
               </button>
               
               {isMenuOpen && (
-                <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10">
+                <div ref={menuRef} className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10">
                   <Link href="/profile" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Your Profile</Link>
-                  <Link href="/settings" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Settings</Link>
+                  <Link href="/history" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">History</Link>
                   <div className="border-t border-gray-100"></div>
                   <LogoutButton className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" />
                 </div>
@@ -159,8 +178,8 @@ export default function Navbar() {
             <Link href="/profile" className="block px-4 py-2 text-base font-medium text-gray-700 hover:bg-gray-100 rounded-md">
               Profile
             </Link>
-            <Link href="/settings" className="block px-4 py-2 text-base font-medium text-gray-700 hover:bg-gray-100 rounded-md">
-              Settings
+            <Link href="/history" className="block px-4 py-2 text-base font-medium text-gray-700 hover:bg-gray-100 rounded-md">
+              History
             </Link>
             <div className="px-4 py-2">
               <LogoutButton className="w-full text-left text-base font-medium text-gray-700 hover:bg-gray-100 rounded-md" />

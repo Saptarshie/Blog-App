@@ -66,5 +66,12 @@ export const BlogSchema = Joi.object({
     .required()
     .messages({
       'any.required': 'Premium status must be specified'
-    })
+    }),
+  _id: Joi.string()
+  .pattern(/^[0-9a-fA-F]{24}$/)
+  .allow(null, '')
+  .optional()
+  .messages({
+    'string.pattern.base': 'Blog ID must be a valid MongoDB ObjectId'
+  })
 });

@@ -110,7 +110,7 @@ export default function SignIn() {
             disabled={loading}
             className={`w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg font-medium transition ${loading ? 'opacity-75 cursor-not-allowed' : ''}`}
           >
-            {loading ? 'Creating account...' : 'Sign In'}
+            {loading ? 'Signing In...' : 'Sign In'}
           </button>
         </form>
         

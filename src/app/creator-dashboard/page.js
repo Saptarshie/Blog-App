@@ -59,10 +59,11 @@ export default function CreatorDashboard({ initialData }) {
   }, [initialData]);
 
   return (
+    <>
     <div className="min-h-screen bg-gray-50 flex">
       {/* Sidebar */}
       <div className={`${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} 
-                      fixed inset-y-0 left-0 z-30 w-64 bg-gradient-to-br from-indigo-800 to-purple-900 
+                      fixed top-14 bottom-0 left-0 z-30 w-64 bg-gradient-to-br from-indigo-800 to-purple-900 
                       transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-auto`}>
         <div className="flex items-center justify-between h-16 px-6 bg-indigo-900">
           <div className="flex items-center">
@@ -177,7 +178,7 @@ export default function CreatorDashboard({ initialData }) {
               </div>
               <div>
                 <p className="text-sm font-medium text-gray-600">Subscribers</p>
-                <p className="text-3xl font-bold text-gray-900">{user.subscriberCount >= 0 ? user.subscriberCount : 0}</p>
+                <p className="text-3xl font-bold text-gray-900">{user?.subscriberCount}</p>
               </div>
             </div>
             
@@ -188,7 +189,7 @@ export default function CreatorDashboard({ initialData }) {
               </div>
               <div>
                 <p className="text-sm font-medium text-gray-600">Earnings</p>
-                <p className="text-3xl font-bold text-gray-900">$0.00</p>
+                <p className="text-3xl font-bold text-gray-900">${user?.amount || 0}</p> sepolia-ETH 
               </div>
             </div>
           </div>
@@ -229,6 +230,7 @@ export default function CreatorDashboard({ initialData }) {
         </main>
       </div>
     </div>
+    </>
   );
 }
 
