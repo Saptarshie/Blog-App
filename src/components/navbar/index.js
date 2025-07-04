@@ -45,7 +45,7 @@ export default function Navbar() {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [isMenuOpen]);
-  console.log("User is : ",user);
+  // console.log("User is : ",user);
   // Handle scroll effect
   useEffect(() => {
     const handleScroll = () => {

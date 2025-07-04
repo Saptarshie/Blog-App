@@ -62,6 +62,23 @@ const userSchema = new mongoose.Schema({
 }]
 })
 
+const HistorySchema = new mongoose.Schema({
+  username: {
+      type: String,
+      unique: true
+    },
+    visitHistory: {
+        type: [{
+            blogId: { type: mongoose.Schema.Types.ObjectId, ref: 'Blog3' },
+            visitedAt: { type: Date, default: Date.now }
+        }],
+        default: [],
+        // Limit array size to 20 elements
+        validate: [array => array.length <= 20, 'Visit history exceeds maximum size of 20']
+    }
+  });
+
+
 // Example schema for pending transactions
 const PendingTransactionSchema = new mongoose.Schema({
   transactionHash: { type: String, required: true, unique: true },
@@ -76,4 +93,5 @@ const PendingTransactionSchema = new mongoose.Schema({
 const Blog = mongoose.models.Blog3 || mongoose.model("Blog3", blogSchema);
 const User = mongoose.models.User3 || mongoose.model("User3", userSchema);
 const PendingTransaction = mongoose.models.PendingTransaction3 || mongoose.model("PendingTransaction3", PendingTransactionSchema);
-export { Blog, User, PendingTransaction };
+const History = mongoose.models.History3 || mongoose.model("History3", HistorySchema);
+export { Blog, User, PendingTransaction, History };

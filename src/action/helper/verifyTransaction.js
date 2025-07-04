@@ -1,16 +1,11 @@
 // In src/action/subscriptionAction.js
-import { ethers } from 'ethers';
-
+import Web3 from 'web3';
 export async function verifyTransaction(ReceiverWalletAddress, transactionHash, subscriptionPrice) {
   try {
-    // Connect to Sepolia testnet
-    const provider = new ethers.providers.JsonRpcProvider(
-      process.env.INFURA_API_URL || `https://sepolia.infura.io/v3/${process.env.INFURA_ID}`
-    );
+    const web3 = new Web3(process.env.INFURA_API_URL || 
+                       `https://sepolia.infura.io/v3/${process.env.INFURA_ID}`);
     
-    // Check if transaction exists at all
-    const transaction = await provider.getTransaction(transactionHash);
-    
+    const transaction = await web3.eth.getTransaction(transactionHash);
     if (!transaction) {
       return {
         success: false,
@@ -32,21 +27,24 @@ export async function verifyTransaction(ReceiverWalletAddress, transactionHash, 
     }
     
     // For confirmed transactions, verify details
-    const receipt = await provider.getTransactionReceipt(transactionHash);
-    
-    if (!receipt || receipt.status !== 1) {
+    // const receipt = await provider.getTransactionReceipt(transactionHash);
+    const receipt = await web3.eth.getTransactionReceipt(transactionHash);
+        // Add before the if statement in verifyTransaction.js
+
+    if (!receipt || Number(receipt.status) !== 1) {
       return {
         success: false,
         status: 400,
         message: "Transaction failed",
       };
-    }
-    
+    }    
     // Verify correct recipient and amount
     const isCorrectReceiver = transaction.to?.toLowerCase() === ReceiverWalletAddress.toLowerCase();
-    const transactionValue = ethers.utils.formatEther(transaction.value);
+    // const transactionValue = ethers.formatEther(transaction.value);
+    const transactionValue = web3.utils.fromWei(transaction.value, 'ether');
     const isCorrectAmount = parseFloat(transactionValue) >= parseFloat(subscriptionPrice);
     
+
     if (!isCorrectReceiver || !isCorrectAmount) {
       return {
         success: false,

@@ -33,7 +33,7 @@ export default function Profile() {
     }
 
     getUserData();
-  }, []);
+  }, [unsubscribing]);
 
   const handleUnsubscribe = async (creatorId) => {
     try {
@@ -156,15 +156,15 @@ export default function Profile() {
                           </p>
                         </div>
                         <button
-                          onClick={() => handleUnsubscribe(sub.creator)}
-                          disabled={unsubscribing === sub.creator}
+                          onClick={() => handleUnsubscribe(sub)}
+                          disabled={unsubscribing === sub}
                           className={`px-4 py-2 rounded-md text-sm font-medium ${
                             unsubscribing === sub.creator
                               ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                               : 'bg-red-50 text-red-700 hover:bg-red-100'
                           }`}
                         >
-                          {unsubscribing === sub.creator ? 'Unsubscribing...' : 'Unsubscribe'}
+                          {unsubscribing === sub ? 'Unsubscribing...' : 'Unsubscribe'}
                         </button>
                       </div>
                     </div>

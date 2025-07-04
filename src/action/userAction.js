@@ -25,8 +25,8 @@ export async function updateCreatorSettings(data) {
     }
     
     // Validate subscription price
-    if (data.subscriptionPrice && (data.subscriptionPrice < 0.99 || data.subscriptionPrice > 99.99)) {
-      return { success: false, status: 400, message: "Subscription price must be between $0.99 and $99.99" };
+    if (data.subscriptionPrice && (data.subscriptionPrice < 0 || data.subscriptionPrice > 0.99)) {
+      return { success: false, status: 400, message: "Subscription price must be between $0 and $99.99" };
     }
     
     // Only update fields that were provided

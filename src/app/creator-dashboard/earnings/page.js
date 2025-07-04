@@ -213,9 +213,9 @@ export default function Earnings() {
                   <input
                     id="subscriptionPrice"
                     type="number"
-                    min="0.99"
-                    max="99.99"
-                    step="0.01"
+                    min="0"
+                    max="0.99"
+                    step="0.0001"
                     value={subscriptionPrice}
                     onChange={(e) => setSubscriptionPrice(e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"

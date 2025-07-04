@@ -1,7 +1,5 @@
 'use server'
-import { isValidWalletAddress } from "@/utils/functions/isValidWallet";
-import { redirect } from "next/navigation";
-import {User,Blog} from "@/models";
+import {User,Blog,History} from "@/models";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { cookies } from "next/headers";
@@ -11,6 +9,7 @@ const Joi = require('joi');
 const fs = require('fs');
 // Define validation schema}
 import { BlogSchema } from "@/components/joi-schemas/add-blog";
+import { trackBlogVisit } from "./helper/trackBlogVisit";
 export async function AddBlog(data) {
   try {
     await connectToDB();
@@ -251,6 +250,8 @@ export async function fetchBlogById(blogId) {
         author: blog.author
       };
     }
+
+    trackBlogVisit(user.username, blogId);
     return {
       success: true,
       status: 200,
@@ -344,6 +345,61 @@ export async function deleteBlog(blogId) {
       success: false,
       status: 500,
       message: error.message || "An error occurred while deleting the blog",
+    };
+  }
+}
+export async function fetchHistory() {
+  try {
+    await connectToDB();
+    const token = await cookies().get("token")?.value;
+    if (!token) {
+      return {
+        success: false,
+        status: 401,
+        message: "User not authenticated",
+        visitedBlogs: [] // Always include an empty array
+      };
+    }
+    
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || "secret");
+    const user = await User.findById(decoded.id);
+    if (!user) {
+      return {
+        success: false,
+        status: 404,
+        message: "User not found",
+        visitedBlogs: [] // Always include an empty array
+      };
+    }
+    
+    const history = await History.findOne({ username: user.username });
+
+    if (!history || !history.visitHistory || history.visitHistory.length === 0) {
+      return {
+        success: true,
+        status: 200,
+        visitedBlogs: [] // Return empty array if no history found
+      };
+    }
+
+    // Extract blog IDs from visitHistory
+    const blogIds = history.visitHistory.map(visit => visit.blogId);
+
+    // Fetch blog details
+    const blogs = await Blog.find({ _id: { $in: blogIds } }).lean();
+
+    return {
+      success: true,
+      status: 200,
+      visitedBlogs:  JSON.parse(JSON.stringify(blogs))
+    };
+  } catch (error) {
+    console.log("Error fetching history:", error);
+    return {
+      success: false,
+      status: 500,
+      message: error.message || "Failed to fetch history",
+      visitedBlogs: [] // Always include an empty array
     };
   }
 }

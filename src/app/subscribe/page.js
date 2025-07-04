@@ -52,9 +52,10 @@ export default function SubscribePage() {
       if (response.success) {
         setSuccess(true);
         setTimeout(() => {
-          router.push(`/profile/${author}`);
+          router.push(`/profile`);
         }, 2000);
       } else {
+        console.error(response);
         setError(response.message);
       }
     } catch (err) {
