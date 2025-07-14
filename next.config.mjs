@@ -18,6 +18,11 @@ const nextConfig = {
       allowedOrigins: ['localhost:3000', 'n2g9pcp2-3000.inc1.devtunnels.ms'],
     },
   },
+  images: {
+    domains: ['localhost'], // Add your domain if needed
+  },
+  // Ensure public directory is properly served
+  assetPrefix: '',
 };
 
 export default nextConfig;

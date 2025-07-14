@@ -1,65 +1,79 @@
 "use client";
-import { useState, useEffect,useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import LogoutButton from '../buttons/logout-button';
-import { useSelector,useDispatch } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { setUser } from '@/store/slices/user-slice';
 import { fetchUserAction } from '@/action';
+
 export default function Navbar() {
   const dispatch = useDispatch()
+  const router = useRouter();
+  const user = useSelector((state) => state.userslice);
   
+  // States
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  
+  // Refs for click outside detection
+  const desktopMenuRef = useRef(null);
+  const mobileMenuRef = useRef(null);
+  const mobileMenuButtonRef = useRef(null);
+  
+  // Fetch user data on component mount
   useEffect(() => {
-    // Fetch user data and update Redux store
     const fetchUserData = async () => {
       const response = await fetchUserAction()
       if (response.success) {
         dispatch(setUser(response.user))
       }
     }
-    
     fetchUserData()
   }, [dispatch]);
   
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const router = useRouter();
-  const user = useSelector((state) => state.userslice);
-  const menuRef = useRef(null);
-   // Add this effect for click outside detection
+  // Handle scroll effect
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 10);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+  
+  // Click outside detection for both mobile and desktop menus
   useEffect(() => {
     function handleClickOutside(event) {
-      if (menuRef.current && !menuRef.current.contains(event.target)) {
+      // Skip if menu is already closed
+      if (!isMenuOpen) return;
+      
+      // Check if click was on the menu toggle button
+      const isMenuButton = mobileMenuButtonRef.current && 
+                          mobileMenuButtonRef.current.contains(event.target);
+      
+      // Check if click was inside any menu
+      const isInsideDesktopMenu = desktopMenuRef.current && 
+                                 desktopMenuRef.current.contains(event.target);
+      const isInsideMobileMenu = mobileMenuRef.current && 
+                                mobileMenuRef.current.contains(event.target);
+      
+      // Only close if clicked outside everything and not on the toggle button
+      if (!isMenuButton && !isInsideDesktopMenu && !isInsideMobileMenu) {
         setIsMenuOpen(false);
       }
     }
     
-    // Only add the event listener if the menu is open
+    // Add listener only when menu is open
     if (isMenuOpen) {
       document.addEventListener("mousedown", handleClickOutside);
     }
     
-    // Clean up the event listener
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [isMenuOpen]);
-  // console.log("User is : ",user);
-  // Handle scroll effect
-  useEffect(() => {
-    const handleScroll = () => {
-      if (window.scrollY > 10) {
-        setIsScrolled(true);
-      } else {
-        setIsScrolled(false);
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
+  
   // Handle search submission
   const handleSearch = (e) => {
     e.preventDefault();
@@ -67,6 +81,17 @@ export default function Navbar() {
       router.push(`/search?q=${encodeURIComponent(searchQuery)}`);
     }
   };
+  
+  // Toggle menu with proper event handling
+  const toggleMenu = (e) => {
+    e.stopPropagation();
+    setIsMenuOpen(!isMenuOpen);
+  };
+  const resetNavStates = () => {
+  setIsMenuOpen(false);
+  setSearchQuery('');
+  // Add any other state resets here
+};
 
   return (
     <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 p-2 ${
@@ -76,7 +101,7 @@ export default function Navbar() {
         <div className="flex justify-between items-center">
           {/* Logo/Brand */}
           <div className="flex items-center">
-            <Link href="/" className="flex items-center">
+            <Link href="/" onClick={resetNavStates} className="flex items-center">
               <span className="text-xl font-bold text-blue-600">BlogApp</span>
             </Link>
           </div>
@@ -104,13 +129,13 @@ export default function Navbar() {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-4">
-            <Link href={user.subscriberCount<0 ? "/become-creator" : "/creator-dashboard"} className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white px-4 py-2 rounded-full font-medium transition-all">
+            <Link onClick={resetNavStates} href={user.subscriberCount<0 ? "/become-creator" : "/creator-dashboard"} className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white px-4 py-2 rounded-full font-medium transition-all">
               {user.subscriberCount<0 ? "Become a Creator" : "Go to Dashboard!"}
             </Link>
             
             <div className="relative">
               <button 
-                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                onClick={toggleMenu}
                 className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-200 hover:bg-gray-300 transition-colors"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -119,11 +144,11 @@ export default function Navbar() {
               </button>
               
               {isMenuOpen && (
-                <div ref={menuRef} className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10">
-                  <Link href="/profile" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Your Profile</Link>
-                  <Link href="/history" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">History</Link>
+                <div ref={desktopMenuRef} className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10">
+                  <Link href="/profile" onClick={resetNavStates} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Your Profile</Link>
+                  <Link href="/history" onClick={resetNavStates} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">History</Link>
                   <div className="border-t border-gray-100"></div>
-                  <LogoutButton className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" />
+                  <LogoutButton onClick={resetNavStates} className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" />
                 </div>
               )}
             </div>
@@ -132,7 +157,9 @@ export default function Navbar() {
           {/* Mobile menu button */}
           <div className="md:hidden flex items-center">
             <button
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              ref={mobileMenuButtonRef}
+              onClick={toggleMenu}
+              aria-label="Toggle mobile menu"
               className="inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-gray-900 hover:bg-gray-100 focus:outline-none"
             >
               <svg className="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -150,7 +177,7 @@ export default function Navbar() {
       {/* Mobile menu, show/hide based on menu state */}
       {isMenuOpen && (
         <div className="md:hidden bg-white shadow-lg rounded-b-lg mt-2 mx-2">
-          <div className="px-2 pt-2 pb-3 space-y-1">
+          <div ref={mobileMenuRef} className="px-2 pt-2 pb-3 space-y-1">
             {/* Search Bar - Mobile */}
             <form onSubmit={handleSearch} className="p-2">
               <div className="relative">
@@ -172,17 +199,32 @@ export default function Navbar() {
               </div>
             </form>
             
-            <Link href={user.subscriberCount<0 ? "/become-creator" : "/creator-dashboard"} className="block text-center bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white px-4 py-2 rounded-full font-medium transition-all">
+            <Link 
+              href={user.subscriberCount<0 ? "/become-creator" : "/creator-dashboard"} 
+              className="block text-center bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white px-4 py-2 rounded-full font-medium transition-all"
+              onClick={() => setIsMenuOpen(false)}
+            >
               {user.subscriberCount<0 ? "Become a Creator" : "Go to Dashboard!"}
             </Link>
-            <Link href="/profile" className="block px-4 py-2 text-base font-medium text-gray-700 hover:bg-gray-100 rounded-md">
+            <Link 
+              href="/profile" 
+              className="block px-4 py-2 text-base font-medium text-gray-700 hover:bg-gray-100 rounded-md"
+              onClick={() => setIsMenuOpen(false)}
+            >
               Profile
             </Link>
-            <Link href="/history" className="block px-4 py-2 text-base font-medium text-gray-700 hover:bg-gray-100 rounded-md">
+            <Link 
+              href="/history" 
+              className="block px-4 py-2 text-base font-medium text-gray-700 hover:bg-gray-100 rounded-md"
+              onClick={() => setIsMenuOpen(false)}
+            >
               History
             </Link>
             <div className="px-4 py-2">
-              <LogoutButton className="w-full text-left text-base font-medium text-gray-700 hover:bg-gray-100 rounded-md" />
+              <LogoutButton 
+                className="w-full text-left text-base font-medium text-gray-700 hover:bg-gray-100 rounded-md" 
+                onClick={() => setIsMenuOpen(false)}
+              />
             </div>
           </div>
         </div>

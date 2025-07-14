@@ -47,11 +47,12 @@ A modern, feature-rich blogging platform built with Next.js that allows users to
 
 3. Create a `.env.local` file in the project root with the following variables:
    ```
-   MONGODB_URI=your_mongodb_connection_string
-   JWT_SECRET=your_jwt_secret
+   INFURA_ID=
+   NEXT_PUBLIC_INFURA_ID=
+   MONGODB_URL=
    ```
 
-4. Run the development server:
+1. Run the development server:
    ```bash
    npm run dev
    ```
@@ -98,18 +99,27 @@ blogapp/
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
-## Future Plans
+## Bugs
+- On uploading new blog , the thumbnail image is not showing unless server is restarted.
+- Subscription payment history tracker is not yet implemented ,...hence users can double-count payments (probably a request-id based / random-disposable wallet based payments will be implemented in future)
 
-- Implement a history tracker for users.
+## Future Plans (feel free to contribute🫡)
+
 - Add a commenting feature for blog posts.
 - Integrate Gemini/OpenRouter for search-summary and as content-creation assistant.
 - Enhance the search functionality with autocomplete.
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-(Quick tips :- just mention my name 😅 'Saptarshi' , since i'm currently suffring from a huge shortage of Validation in my life😎)
-
+- Implement a earnings-time chart (in the earnings Page).
+- Add a "Save for later" feature for users.
+- Integrate a newsletter subscription system.
+- Implement a referral program for users.
+- Add a "Like" feature for blog posts.
+- Integrate a social sharing system for blog posts.
+- Add a "Follow" feature for users.
+- Implement a "Recommendations" feature for users.
+- Integrate a "Notifications" system for users.
+- Add a "Report" feature for users to report inappropriate content.
+- Implement a "Flag" feature for users to flag inappropriate content.
+- Add a "Share" feature for users to share blog posts on social media.
 ---
 
 Thank you for considering BlogApp for your blogging needs!

@@ -252,7 +252,7 @@ export default function Earnings() {
                 </div>
                 <div>
                   <span className="text-sm font-medium text-gray-500">Subscription Price:</span>
-                  <p className="text-gray-800">${Number(subscriptionPrice.toFixed(4))} sepolia-eth / life </p>
+                  <p className="text-gray-800">${parseFloat(subscriptionPrice || 0).toFixed(4)} sepolia-eth / life </p>
                 </div>
               </div>
             )}

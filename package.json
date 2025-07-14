@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
-    "@reduxjs/toolkit": "^2.8.2",
+    "@reduxjs/toolkit": "^2.8.0",
     "@tailwindcss/typography": "^0.5.16",
     "@tiptap/extension-image": "^2.23.1",
     "@tiptap/extension-link": "^2.23.1",
@@ -21,6 +21,7 @@
     "bcryptjs": "^3.0.2",
     "date-fns": "^4.1.0",
     "fs": "^0.0.1-security",
+    "immer": "^10.0.0",
     "joi": "^17.13.3",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.16.1",
