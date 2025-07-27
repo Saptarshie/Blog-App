@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { AddBlog } from '@/action/blogAction';
 import { useRouter } from 'next/navigation';
 import TipTapEditor from '@/components/editor/tip-tap-editor';
+import ImageUploader from '@/components/creator/ImageUploader';
 import { useEffect } from 'react';
 
 export default function CreateBlog({initialData={
@@ -44,18 +45,6 @@ useEffect(() => {
 
   const handleContentChange = (content) => {
     setFormData({ ...formData, content });
-  };
-
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setFormData({ ...formData, image: file });
-      const reader = new FileReader();
-      reader.onload = () => {
-        setPreview(reader.result);
-      };
-      reader.readAsDataURL(file);
-    }
   };
 
   const handleSubmit = async (e) => {
@@ -172,33 +161,11 @@ useEffect(() => {
           <label htmlFor="image" className="block text-sm font-medium text-gray-700 mb-1">
             Featured Image
           </label>
-          <div className="mt-1 flex items-center">
-            <input
-              id="image"
-              name="image"
-              type="file"
-              accept="image/*"
-              onChange={handleImageChange}
-              className="hidden"
-            />
-            <label
-              htmlFor="image"
-              className="cursor-pointer bg-white py-2 px-3 border border-gray-300 rounded-md shadow-sm text-sm leading-4 font-medium text-gray-700 hover:bg-gray-50"
-            >
-              Choose image
-            </label>
-            <span className="ml-3 text-sm text-gray-500">
-              {formData.image ? formData.image.name : (preview ? 'Current image' : 'No file chosen')}
-            </span>
-          </div>
-          
-          {preview && (
-            <div className="mt-3">
-              <img src={typeof preview === 'string' ? preview : preview} alt="Preview" className="h-40 rounded-md object-cover" />
-            </div>
-          )}
+          <ImageUploader 
+            onImageSelected={(file) => setFormData({...formData, image: file})}
+            initialPreview={initialData?.image?.imagePath || null}
+          />
         </div>
-
         
         {/* Tags Field */}
         <div>
