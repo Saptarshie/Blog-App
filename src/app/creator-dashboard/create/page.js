@@ -16,8 +16,8 @@ export default function CreateBlog({initialData={
   ) {
 useEffect(() => {
   // Set preview image when initialData is provided for editing
-  if (initialData?.image) {
-    setPreview(initialData.image);
+  if (initialData?.image?.imagePath) {
+    setPreview(initialData.image.imagePath);
   }
 }, [initialData]);
   const router = useRouter();

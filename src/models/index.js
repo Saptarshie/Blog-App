@@ -5,7 +5,10 @@ const blogSchema = new mongoose.Schema({
   title: String,
   description: String,
   content: String,
-  image: String,
+  image:{
+    imagePath:{type:String,default:''},
+    image_id: {type:String,default:''}
+  },
   author: { 
     type: String, 
     index: true 
@@ -90,8 +93,8 @@ const PendingTransactionSchema = new mongoose.Schema({
   status: { type: String, enum: ['pending', 'completed', 'failed'], default: 'pending' }
 });
 
-const Blog = mongoose.models.Blog3 || mongoose.model("Blog3", blogSchema);
-const User = mongoose.models.User3 || mongoose.model("User3", userSchema);
-const PendingTransaction = mongoose.models.PendingTransaction3 || mongoose.model("PendingTransaction3", PendingTransactionSchema);
-const History = mongoose.models.History3 || mongoose.model("History3", HistorySchema);
+const Blog = mongoose.models.Blog4 || mongoose.model("Blog4", blogSchema);
+const User = mongoose.models.User4 || mongoose.model("User4", userSchema);
+const PendingTransaction = mongoose.models.PendingTransaction4 || mongoose.model("PendingTransaction4", PendingTransactionSchema);
+const History = mongoose.models.History4 || mongoose.model("History4", HistorySchema);
 export { Blog, User, PendingTransaction, History };

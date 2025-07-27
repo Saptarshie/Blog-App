@@ -57,7 +57,7 @@ export default function CreatorBlogCard({ blog, refreshBlogs }) {
   };
   
   // Get default placeholder if no image
-  const blogImage = blog.image || '/images/blog-placeholder.jpg';
+  const blogImage = blog.image.imagePath || '/images/blog-placeholder.jpg';
   
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg border border-gray-200">

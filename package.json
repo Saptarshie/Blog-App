@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
+    "dev": "next dev ",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
@@ -19,6 +19,7 @@
     "@tiptap/react": "^2.23.1",
     "@tiptap/starter-kit": "^2.23.1",
     "bcryptjs": "^3.0.2",
+    "cloudinary": "^2.7.0",
     "date-fns": "^4.1.0",
     "fs": "^0.0.1-security",
     "immer": "^10.0.0",

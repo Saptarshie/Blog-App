@@ -19,10 +19,21 @@ const nextConfig = {
     },
   },
   images: {
-    domains: ['localhost'], // Add your domain if needed
+    domains: ['localhost','res.cloudinary.com'], 
   },
   // Ensure public directory is properly served
   assetPrefix: '',
+  // Add webpack configuration here
+  webpack: (config, { isServer }) => {
+    if (!isServer) {
+      // Don't resolve 'cloudinary' module on the client side
+      config.resolve.fallback = { 
+        ...config.resolve.fallback,
+        cloudinary: false 
+      };
+    }
+    return config;
+  },
 };
 
 export default nextConfig;

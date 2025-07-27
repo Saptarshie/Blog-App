@@ -17,7 +17,7 @@ A modern, feature-rich blogging platform built with Next.js that allows users to
 - **Frontend**: Next.js, React, TailwindCSS
 - **State Management**: Redux Toolkit
 - **Authentication**: JWT, bcryptjs
-- **Content Editing**: React Quill
+- **Content Editing**: Tip-tap editor
 - **Backend**: Next.js API routes with server actions
 - **Database**: MongoDB with Mongoose
 - **Validation**: Joi

@@ -3,7 +3,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { formatDistanceToNow } from "date-fns";
-
 export default async function BlogPage({ params }) {
   const res = await fetchBlogById(params["blog-id"]);
   console.log("res is: ", res);
@@ -67,11 +66,19 @@ export default async function BlogPage({ params }) {
       </header>
       
       {/* Featured Image */}
-      {blog.image && (
+      {blog?.image?.imagePath && (
         <div className="mb-10 rounded-xl overflow-hidden shadow-lg">
-          <img 
+          {/* <img 
             src={blog.image}
             alt={blog.title} 
+            className="w-full h-[400px] object-cover"
+          /> */}
+          <Image 
+            src={blog.image.imagePath}
+            alt={blog.title} 
+            height={400}
+            width={800}
+            loading="lazy"
             className="w-full h-[400px] object-cover"
           />
         </div>

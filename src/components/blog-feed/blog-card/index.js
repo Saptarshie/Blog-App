@@ -12,7 +12,7 @@ export default function BlogCard({ blog }) {
         <div className="relative w-full h-48">
           {blog.image ? (
             <Image 
-              src={blog.image} 
+              src={blog.image?.imagePath} 
               alt={blog.title || 'Blog thumbnail'} 
               fill
               className="object-cover"

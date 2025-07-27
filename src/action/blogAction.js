@@ -5,6 +5,7 @@ import jwt from "jsonwebtoken";
 import { cookies } from "next/headers";
 import {connectToDB} from "@/database";
 import {writeFile,mkdir} from "fs/promises";
+import { uploadAndTransform, deleteImage } from "@/action/helper/handleImage";
 const Joi = require('joi');
 const fs = require('fs');
 // Define validation schema}
@@ -32,31 +33,15 @@ export async function AddBlog(data) {
     }
 
     // Process file upload if image is provided as FormData
-    let imagePath = data.image;
+    let imagePath = data.image ,image_id="";
     if (data.image instanceof File || data.image instanceof Blob) {
-      const fileBuffer = Buffer.from(await data.image.arrayBuffer());
-      // const fileName = `${user.username}-${Date.now()}-${data.image.name}`;
-       // Sanitize the filename by replacing spaces with underscores
-      const sanitizedName = data.image.name.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_\-.]/g, '');
-      const fileName = `${user.username}-${Date.now()}-${sanitizedName}`;
-  
-      const uploadDir = `public/upload/thumbnail`;
-      const fullPath = `${uploadDir}/${fileName}`;
-      
-      // Ensure directory exists
-      await mkdir(uploadDir, { recursive: true });
-      
-      // Write file to disk
-      await writeFile(fullPath, fileBuffer);
-      
-      // Update the image path to the relative URL path
-      imagePath = `/upload/thumbnail/${fileName}`;
+      ({imagePath,image_id} = await uploadAndTransform(data.image));
     }
 
     // Prepare blog data with the image path
     const blogData = {
       ...data,
-      image: imagePath,
+      image: {imagePath,image_id},
       author: user.username
     };
 
@@ -80,16 +65,14 @@ export async function AddBlog(data) {
             };
           }
           // Delete the image file if it exists
-        if (imagePath && imagePath !== blog1?.image && blog1?.image && blog1?.image.startsWith('/upload/')) {
-      const oldImagePath = `public${blog1?.image}`;
+        if (imagePath && imagePath !== blog1?.image.imagePath && blog1?.image && blog1?.image?.imagePath) {
+      const oldImageId = blog1?.image?.image_id;
       try {
         // Check if file exists before attempting to delete
-        if (fs.existsSync(oldImagePath)) {
-          fs.unlinkSync(oldImagePath);
-          console.log(`Deleted image: ${oldImagePath}`);
-        }
-      } catch (fileError) {
-        console.error(`Failed to delete image file: ${oldImagePath}`, fileError);
+        if(oldImageId) deleteImage(oldImageId);
+        ({imagePath,image_id} = await uploadAndTransform(data.image));
+      } catch (Error) {
+        console.error(`Failed to delete image file: ${oldImageId}`, Error);
         // Continue with blog deletion even if image deletion fails
       }
     }
@@ -198,7 +181,7 @@ export async function fetchBlogs(page = 1, limit = 10, filters = {}) {
 export async function searchBlogs(searchText) {
   try {
     const blogs = await Blog.find(
-      { $text: { $search: searchText } },
+      { $text: { $search: searchText,$options: 'ix' } },
       { score: { $meta: "textScore" },content: 0 }
     )
     .sort({ score: { $meta: "textScore" } })
@@ -311,19 +294,15 @@ export async function deleteBlog(blogId) {
       };
     }
     
-    if (blog.image && blog.image.startsWith('/upload/')) {
-      const imagePath = `public${blog.image}`;
+    if (blog.image?.image_id) {
       try {
-        // Check if file exists before attempting to delete
-        if (fs.existsSync(imagePath)) {
-          fs.unlinkSync(imagePath);
-          console.log(`Deleted image: ${imagePath}`);
-        }
+        await deleteImage(blog.image.image_id);
+        console.log(`Deleted image: ${blog.image.image_id}`);
       } catch (fileError) {
-        console.error(`Failed to delete image file: ${imagePath}`, fileError);
-        // Continue with blog deletion even if image deletion fails
+        console.error(`Failed to delete image: ${blog.image.image_id}`, fileError);
       }
     }
+
 
     // Delete the blog
     await Blog.findByIdAndDelete(blogId);

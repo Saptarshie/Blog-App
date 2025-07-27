@@ -29,15 +29,17 @@ export const BlogSchema = Joi.object({
       'any.required': 'Content is required'
     }),
     
-    image: Joi.string()
-    .pattern(/^\/[a-zA-Z0-9_\-\/\.]+\.(jpg|jpeg|png|gif|webp)$/i)
-    .allow('')
-    .optional()
-    .messages({
-        'string.pattern.base': 'Image path must be valid and point to an image file',
-        'string.empty': 'Image path cannot be empty if provided'
-    }),
-
+  image: Joi.object({
+    imagePath: Joi.string()
+      .pattern(/^https?:\/\/.+\.(jpg|jpeg|png|gif|webp)$/i)
+      .required()
+      .messages({
+        'string.pattern.base': 'Image path must be a valid URL pointing to an image file'
+      }),
+    image_id: Joi.string().allow(null, '').optional()
+  }).optional().messages({
+    'object.base': 'Image must be an object with valid properties'
+  }),
     
   author: Joi.string()
     .required()
@@ -68,10 +70,10 @@ export const BlogSchema = Joi.object({
       'any.required': 'Premium status must be specified'
     }),
   _id: Joi.string()
-  .pattern(/^[0-9a-fA-F]{24}$/)
-  .allow(null, '')
-  .optional()
-  .messages({
-    'string.pattern.base': 'Blog ID must be a valid MongoDB ObjectId'
-  })
+    .pattern(/^[0-9a-fA-F]{24}$/)
+    .allow(null, '')
+    .optional()
+    .messages({
+      'string.pattern.base': 'Blog ID must be a valid MongoDB ObjectId'
+    })
 });
