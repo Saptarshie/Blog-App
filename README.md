@@ -60,20 +60,134 @@ A modern, feature-rich blogging platform built with Next.js that allows users to
 
 ```
 blogapp/
+├── .gitignore
+├── jsconfig.json
+├── next.config.mjs
+├── package-lock.json
+├── package.json
+├── playwright.config.js
+├── postcss.config.mjs
+├── README.md
+├── tmp.txt
 ├── public/
-│   └── upload/
-│       └── thumbnail/  # Blog post images
+│   ├── upload/
+│   │   └── thumbnail/
+├── recommmender4/
+│   ├── celery_app.py
+│   ├── requirements.txt
+│   ├── run.txt
+│   └── app/
+│       ├── __init__.py
+│       ├── config.py
+│       ├── database.py
+│       ├── main.py
+│       ├── models.py
+│       ├── schemas.py
+│       ├── utils.py
+│       └── services/
+│           ├── __init__.py
+│           ├── compute_embedding.py
+│           ├── recommend_service.py
+│           ├── task_queue.py
+│           └── vector_service.py
 ├── src/
-│   ├── action/         # Server actions
-│   ├── app/            # Next.js app directory
-│   ├── components/     # Reusable components
-│   ├── database/       # Database connection
-│   ├── models/         # Mongoose models
-│   ├── store/          # Redux store
-│   │   └── slices/     # Redux slices
-│   └── utils/          # Utility functions
-├── .env.local          # Environment variables
-└── package.json        # Project dependencies
+│   ├── middleware.js
+│   ├── action/
+│   │   ├── blogAction.js
+│   │   ├── index.js
+│   │   ├── subscriptionAction.js
+│   │   ├── userAction.js
+│   │   └── helper/
+│   │       ├── cloudinaryConfig.js
+│   │       ├── createVector.js
+│   │       ├── handleImage.js
+│   │       ├── storePendingTransaction.js
+│   │       ├── trackBlogVisit.js
+│   │       └── verifyTransaction.js
+│   ├── app/
+│   │   ├── favicon.ico
+│   │   ├── globals.css
+│   │   ├── layout.js
+│   │   ├── loading.js
+│   │   ├── page.js
+│   │   ├── authenticate/
+│   │   │   ├── page.js
+│   │   │   ├── sign-in/
+│   │   │   │   └── page.js
+│   │   │   └── sign-up/
+│   │   │       └── page.js
+│   │   ├── become-creator/
+│   │   │   └── page.js
+│   │   ├── blogs/
+│   │   │   └── [blog-id]/
+│   │   ├── creator-dashboard/
+│   │   │   ├── get-server-side-prop.js
+│   │   │   ├── page.js
+│   │   │   ├── blogs/
+│   │   │   │   └── page.js
+│   │   │   ├── create/
+│   │   │   │   └── page.js
+│   │   │   ├── earnings/
+│   │   │   │   └── page.js
+│   │   │   └── edit/
+│   │   │       └── [blog-id]/
+│   │   ├── history/
+│   │   │   └── page.js
+│   │   ├── profile/
+│   │   │   └── page.js
+│   │   ├── search/
+│   │   │   └── page.js
+│   │   ├── settings/
+│   │   │   └── page.js
+│   │   └── subscribe/
+│   │       └── page.js
+│   ├── components/
+│   │   ├── blog-feed/
+│   │   │   ├── blog-card/
+│   │   │   │   └── index.js
+│   │   │   └── blog-list/
+│   │   │       └── index.js
+│   │   ├── buttons/
+│   │   │   └── logout-button.js
+│   │   ├── cards/
+│   │   │   └── CreatorBlogCard.js
+│   │   ├── common-layout/
+│   │   │   └── index.js
+│   │   ├── creator/
+│   │   │   └── ImageUploader.js
+│   │   ├── editor/
+│   │   │   └── tip-tap-editor/
+│   │   │       ├── index.js
+│   │   │       └── tip-tap-style.css
+│   │   ├── history-list/
+│   │   │   └── index.js
+│   │   ├── joi-schemas/
+│   │   │   └── add-blog.js
+│   │   ├── navbar/
+│   │   │   └── index.js
+│   │   └── pseudo-pages/
+│   │       └── CreateBlogClient.js
+│   ├── database/
+│   │   └── index.js
+│   ├── models/
+│   │   └── index.js
+│   ├── provider/
+│   │   └── index.js
+│   ├── services/
+│   │   └── transactionMonitor.js
+│   ├── store/
+│   │   ├── index.js
+│   │   └── slices/
+│   │       ├── blog-slice.js
+│   │       └── user-slice.js
+│   ├── types/
+│   │   └── heroicons-react.d.ts
+│   └── utils/
+│       └── functions/
+│           └── isValidWallet.js
+└── tests/
+    └── hello.spec.js
+
 ```
 
 ## Usage

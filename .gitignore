@@ -47,3 +47,24 @@ public/upload/thumbnail/*
 
 *.venv/*
 *.venv-wsl/*
+
+# Bytecode
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Python virtual environments (common names)
+venv/
+env/
+.env/
+.env*
+.venv/
+.venv-wsl/
+*/.venv/
+*/.venv-wsl/
+
+# Project-specific (repo-root paths)
+# use forward slashes — not backslashes
+/recommmender4/.venv/
+/recommmender4/.venv-wsl/
