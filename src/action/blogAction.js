@@ -80,6 +80,14 @@ export async function AddBlog(data) {
 
       // Update the blog
       const blog = await Blog.findByIdAndUpdate(data._id, blogData, { new: true });
+      if (!blog) {
+        return {
+          success: false,
+          status: 404,
+          message: "Blog not found",
+        };
+      }
+      createVector(blog);
       return {
         success: true,
         status: 200,
@@ -182,7 +190,13 @@ export async function fetchBlogs(page = 1, limit = 10, filters = {}) {
 export async function searchBlogs(searchText) {
   try {
     const blogs = await Blog.find(
-      { $text: { $search: searchText,$options: 'ix' } },
+      { 
+        $text: { 
+          $search: searchText, 
+          $caseSensitive: false, 
+          $diacriticSensitive: false 
+        } 
+      },
       { score: { $meta: "textScore" },content: 0 }
     )
     .sort({ score: { $meta: "textScore" } })
