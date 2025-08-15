@@ -1,8 +1,10 @@
+export const runtime = 'nodejs';
 import { fetchBlogById } from "@/action/blogAction";
 import CreateBlog from "../../create/page";
 import Image from "next/image";
 import Link from "next/link";
-
+import CreateBlogClient from "@/components/pseudo-pages/CreateBlogClient"
+import { AddBlog } from "@/action/blogAction";
 export default async function EditBlog({params}){
     const res = await fetchBlogById(params["blog-id"]);
     console.log("res is: ",res);
@@ -20,6 +22,6 @@ export default async function EditBlog({params}){
         )
     }
     return(
-        <CreateBlog initialData={res.blog}/>
+        <CreateBlogClient AddBlog={AddBlog} initialData={res.blog} />
     )
 }

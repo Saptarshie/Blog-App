@@ -1,4 +1,4 @@
-'use server'
+'use server';
 import {User,Blog,History} from "@/models";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
@@ -6,6 +6,7 @@ import { cookies } from "next/headers";
 import {connectToDB} from "@/database";
 import {writeFile,mkdir} from "fs/promises";
 import { uploadAndTransform, deleteImage } from "@/action/helper/handleImage";
+import createVector from "@/action/helper/createVector";
 const Joi = require('joi');
 const fs = require('fs');
 // Define validation schema}
@@ -90,7 +91,7 @@ export async function AddBlog(data) {
     // Create new blog entry
     const newBlog = new Blog(blogData);
     await newBlog.save();
-
+    createVector(newBlog);
     // Update user's blogs array
     await User.findByIdAndUpdate(
       user._id,
@@ -381,4 +382,30 @@ export async function fetchHistory() {
       visitedBlogs: [] // Always include an empty array
     };
   }
+}
+
+
+const RECOMMENDER_URL = process.env.RECOMMENDER_API_URL // e.g. "https://api.myapp.com"
+
+export async function getRecommendedBlogs(blogIds, k = 5) {
+  // 1) Call the Python recommender
+  const res = await fetch(`${RECOMMENDER_URL}/recommend`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ blog_ids: blogIds, k })
+  })
+  if (!res.ok) {
+    console.error('Recommender error:', await res.text())
+    return []
+  }
+  const { recommended_ids } = await res.json()
+
+  // 2) Fetch full blog docs from Mongo
+  await connectToDB()
+  const objectIds = recommended_ids.map(id => new mongoose.Types.ObjectId(id))
+  const blogs = await Blog.find({ _id: { $in: objectIds } })
+    .sort({ date: -1 })
+    .lean()
+
+  return JSON.parse(JSON.stringify(blogs))
 }
