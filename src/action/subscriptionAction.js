@@ -9,7 +9,9 @@ export async function subscribeToCreator(authorUsername,transactionHash="") {
   try {
     await connectToDB();
     // Get current user from cookie
-    const token = await cookies().get("token")?.value;
+    // const token = await cookies().get("token")?.value;
+        const cookieStore = await cookies(); // ✅ await the cookies() call
+    const token = cookieStore.get("token")?.value;
     if (!token) {
       return {
         success: false,
@@ -111,7 +113,9 @@ export async function unsubscribeFromCreator(authorUsername) {
   try {
     await connectToDB();
     
-    const token = await cookies().get("token")?.value;
+    // const token = await cookies().get("token")?.value;
+        const cookieStore = await cookies(); // ✅ await the cookies() call
+    const token = cookieStore.get("token")?.value;
     if (!token) {
       return {
         success: false,

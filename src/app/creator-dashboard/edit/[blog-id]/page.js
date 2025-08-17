@@ -6,7 +6,9 @@ import Link from "next/link";
 import CreateBlogClient from "@/components/pseudo-pages/CreateBlogClient"
 import { AddBlog } from "@/action/blogAction";
 export default async function EditBlog({params}){
-    const res = await fetchBlogById(params["blog-id"]);
+    // const res = await fetchBlogById(params["blog-id"]);
+     const { "blog-id": blogId } = await params; // ✅ unwrap the Promise
+  const res = await fetchBlogById(blogId);
     console.log("res is: ",res);
     if(res.status === 403){
         return(

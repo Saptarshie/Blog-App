@@ -1,10 +1,15 @@
-import { fetchBlogById } from "@/action/blogAction";
+import { fetchBlogById,getRecommendedBlogs } from "@/action/blogAction";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { formatDistanceToNow } from "date-fns";
+import BlogCard from "@/components/blog-feed/blog-card";
+import {SimilarBlogs,SimilarBlogsLoading} from "@/components/blog-feed/similar-blogs"
+import { Suspense } from "react";
 export default async function BlogPage({ params }) {
-  const res = await fetchBlogById(params["blog-id"]);
+  // const res = await fetchBlogById(params["blog-id"]);
+   const { "blog-id": blogId } = await params; // ✅ unwrap the Promise
+  const res = await fetchBlogById(blogId);
   console.log("res is: ", res);
 
   // Handle unauthorized access to premium content
@@ -107,6 +112,10 @@ export default async function BlogPage({ params }) {
           </div>
         </div>
       )}
+      {/* Similar Blogs Section */}
+      <Suspense fallback={<SimilarBlogsLoading />}>
+        <SimilarBlogs blogId={blogId} />
+      </Suspense>
     </article>
   );
 }

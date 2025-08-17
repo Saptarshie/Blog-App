@@ -7,6 +7,8 @@ import {connectToDB} from "@/database";
 import {writeFile,mkdir} from "fs/promises";
 import { uploadAndTransform, deleteImage } from "@/action/helper/handleImage";
 import createVector from "@/action/helper/createVector";
+import mongoose from 'mongoose';
+
 const Joi = require('joi');
 const fs = require('fs');
 // Define validation schema}
@@ -15,7 +17,9 @@ import { trackBlogVisit } from "./helper/trackBlogVisit";
 export async function AddBlog(data) {
   try {
     await connectToDB();
-    const token = await cookies().get("token")?.value;
+    // const token = await cookies().get("token")?.value;
+        const cookieStore = await cookies(); // ✅ await the cookies() call
+    const token = cookieStore.get("token")?.value;
     if (!token) {
       return {
         success: false,
@@ -213,7 +217,9 @@ export async function searchBlogs(searchText) {
 export async function fetchBlogById(blogId) {
   try {
     await connectToDB();
-    const token = await cookies().get("token")?.value;
+    // const token = await cookies().get("token")?.value;
+        const cookieStore = await cookies(); // ✅ await the cookies() call
+    const token = cookieStore.get("token")?.value;
     if (!token) {
       return {
         success: false,
@@ -268,7 +274,9 @@ export async function fetchBlogById(blogId) {
 export async function deleteBlog(blogId) {
   try {
     await connectToDB();
-    const token = await cookies().get("token")?.value;
+    // const token = await cookies().get("token")?.value;
+        const cookieStore = await cookies(); // ✅ await the cookies() call
+    const token = cookieStore.get("token")?.value;
     
     if (!token) {
       return {
@@ -345,7 +353,9 @@ export async function deleteBlog(blogId) {
 export async function fetchHistory() {
   try {
     await connectToDB();
-    const token = await cookies().get("token")?.value;
+    // const token = await cookies().get("token")?.value;
+        const cookieStore = await cookies(); // ✅ await the cookies() call
+    const token = cookieStore.get("token")?.value;
     if (!token) {
       return {
         success: false,
@@ -401,19 +411,19 @@ export async function fetchHistory() {
 
 const RECOMMENDER_URL = process.env.RECOMMENDER_API_URL // e.g. "https://api.myapp.com"
 
-export async function getRecommendedBlogs(blogIds, k = 5) {
+export async function getRecommendedBlogs(blogIds, k = 5,candidate_pool_size=30) {
   // 1) Call the Python recommender
   const res = await fetch(`${RECOMMENDER_URL}/recommend`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ blog_ids: blogIds, k })
+    body: JSON.stringify({ blog_ids: blogIds, k,candidate_pool_size })
   })
   if (!res.ok) {
     console.error('Recommender error:', await res.text())
     return []
   }
   const { recommended_ids } = await res.json()
-
+  console.log('Recommended blog IDs:', recommended_ids)
   // 2) Fetch full blog docs from Mongo
   await connectToDB()
   const objectIds = recommended_ids.map(id => new mongoose.Types.ObjectId(id))
@@ -422,4 +432,39 @@ export async function getRecommendedBlogs(blogIds, k = 5) {
     .lean()
 
   return JSON.parse(JSON.stringify(blogs))
+}
+
+export async function fetchBlogsByIds(blogIds = []) {
+  try {
+    await connectToDB();
+    
+    // Validate input
+    if (!Array.isArray(blogIds) || blogIds.length === 0) {
+      return {
+        success: false,
+        status: 400,
+        message: "Invalid blog IDs provided",
+        blogs: []
+      };
+    }
+    
+    // Fetch blogs by IDs
+    const blogs = await Blog.find({ _id: { $in: blogIds } }, { content: 0 })
+      .sort({ date: -1 })
+      .lean();
+    
+    return {
+      success: true,
+      status: 200,
+      blogs: JSON.parse(JSON.stringify(blogs))
+    };
+  } catch (error) {
+    console.error("Error fetching blogs by IDs:", error);
+    return {
+      success: false,
+      status: 500,
+      message: error.message || "Failed to fetch blogs",
+      blogs: []
+    };
+  }
 }

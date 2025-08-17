@@ -119,7 +119,9 @@ export async function SignOutAction(){
 export async function fetchUserAction(){
     try{
         const db = await connectToDB();
-        const token = await cookies().get("token")?.value;
+        // const token = await cookies().get("token")?.value;
+            const cookieStore = await cookies(); // ✅ await the cookies() call
+    const token = cookieStore.get("token")?.value;
         if (!token) {
             return {
                 success: false,
@@ -164,7 +166,9 @@ export async function RegisterCreatorAction(data){
     }
     try{
         const db = await connectToDB();
-        const token = await cookies().get("token")?.value;
+        // const token = await cookies().get("token")?.value;
+            const cookieStore = await cookies(); // ✅ await the cookies() call
+    const token = cookieStore.get("token")?.value;
         if (!token) {
             return {
                 success: false,
