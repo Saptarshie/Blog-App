@@ -103,7 +103,7 @@ export default async function BlogPage({ params }) {
             {blog.tags.map((tag, index) => (
               <Link 
                 key={index}
-                href={`/search?tag=${tag}`}
+                href={`/search?q=${tag}`}
                 className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1 rounded-full text-sm transition-colors"
               >
                 {tag}

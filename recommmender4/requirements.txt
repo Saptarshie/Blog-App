@@ -6,7 +6,6 @@ numpy
 python-dotenv
 celery[redis]
 pydantic-settings
-python-dotenv
 pydantic-core>=2.0.0
 langchain_huggingface
 sentence-transformers
