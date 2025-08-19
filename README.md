@@ -241,4 +241,4 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 Thank you for considering BlogApp for your blogging needs!
 
 # congratulations 🥳 , thanks for your generous scrolling 🙂 , 
-here's it is: https//onlypain.in 🙃
+here's it is: https://onlypain.in 🙃
