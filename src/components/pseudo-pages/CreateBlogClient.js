@@ -1,10 +1,12 @@
 // app/creator-dashboard/create/CreateBlogClient.tsx  (CLIENT component)
 'use client';
 
-import { useEffect, useState } from 'react';
+import React ,{ useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import TipTapEditor from '@/components/editor/tip-tap-editor';
 import ImageUploader from '@/components/creator/ImageUploader';
+import  { useRef } from "react";
+import { useChat } from "ai/react";
 export default function CreateBlog({ AddBlog, initialData={
   title: '',
   description: '',
@@ -112,6 +114,18 @@ useEffect(() => {
         <div>
           <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
             Title <span className="text-red-500">*</span>
+            <button 
+              onClick={()=>{}}
+              className="ml-2 px-3 py-1 text-sm bg-gradient-to-r from-rose-500 to-pink-500 text-white rounded-md hover:from-rose-600 hover:to-pink-600 transition-all duration-200 shadow-sm hover:shadow-lg transform hover:-translate-y-0.5 relative overflow-hidden group"
+            >
+              <span className="flex items-center relative z-10">
+                <svg className="w-4 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                Suggest title
+              </span>
+              <div className="absolute inset-0 bg-gradient-to-r from-rose-400 to-pink-400 opacity-0 group-hover:opacity-100 transition-opacity duration-200 blur-sm"></div>
+            </button>
           </label>
           <input
             id="title"
@@ -129,6 +143,18 @@ useEffect(() => {
         <div>
           <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
             Description <span className="text-red-500">*</span>
+            <button 
+                onClick={()=>{}}
+                className="ml-2 px-3 py-1 text-sm bg-gradient-to-r from-purple-500 to-indigo-500 text-white rounded-md hover:from-purple-600 hover:to-indigo-600 transition-all duration-200 shadow-sm hover:shadow-lg transform hover:-translate-y-0.5 relative overflow-hidden group"
+              >
+                <span className="flex items-center relative z-10">
+                  <svg className="w-4 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                  Create me a description
+                </span>
+                <div className="absolute inset-0 bg-gradient-to-r from-purple-400 to-indigo-400 opacity-0 group-hover:opacity-100 transition-opacity duration-200 blur-sm"></div>
+              </button>
           </label>
           <textarea
             id="description"
@@ -146,6 +172,18 @@ useEffect(() => {
         <div>
           <label htmlFor="content" className="block text-sm font-medium text-gray-700 mb-1">
             Content <span className="text-red-500">*</span>
+              <button 
+                onClick={()=>{}}
+                className="ml-2 px-3 py-1 text-sm bg-gradient-to-r from-purple-500 to-indigo-500 text-white rounded-md hover:from-purple-600 hover:to-indigo-600 transition-all duration-200 shadow-sm hover:shadow-lg transform hover:-translate-y-0.5 relative overflow-hidden group"
+              >
+                <span className="flex items-center relative z-10">
+                  <svg className="w-4 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                  Enhance
+                </span>
+                <div className="absolute inset-0 bg-gradient-to-r from-purple-400 to-indigo-400 opacity-0 group-hover:opacity-100 transition-opacity duration-200 blur-sm"></div>
+              </button>
           </label>
           <div className="min-h-[300px]">
             <TipTapEditor

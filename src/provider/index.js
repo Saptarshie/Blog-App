@@ -3,6 +3,7 @@ import { Provider } from "react-redux";
 import React from 'react';
 import { store } from "@/store";
 import Navbar from "@/components/navbar";
+import AskAI from "@/components/ask-ai";
 export default function ReduxProvider({ children }) {
   return (
     <Provider store={store}>

@@ -1,3 +1,4 @@
+"use client";
 // hooks/useReadAloud.js
 import { useState } from 'react';
 

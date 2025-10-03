@@ -47,7 +47,8 @@ public/upload/thumbnail/*
 
 *.venv/*
 *.venv-wsl/*
-
+*.envwsl/*
+recommmender4/envwsl/
 # Bytecode
 __pycache__/
 *.pyc
