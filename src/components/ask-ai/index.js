@@ -4,6 +4,7 @@ import React , { useRef, useState, useEffect } from "react";
 import { useChat } from "ai/react";
 import ReactMarkdown from 'react-markdown';
 import { createPortal } from "react-dom";
+import ThinkingAnimation from "./thinkingAnimation";
 // New Import
 import { Scrollbar } from 'react-scrollbars-custom'; 
 function MessageItem({ message }) {
@@ -68,6 +69,7 @@ function MessageItem({ message }) {
         </div>
     );
 }
+
 function MessagesArea({ messages, isLoading }) {
   const containerRef = useRef(null);
 
@@ -80,6 +82,7 @@ function MessagesArea({ messages, isLoading }) {
 
   return (
     // The Scrollbar container already has padding and vertical space (p-4 space-y-3)
+    <div style={{ width: '100%', height: '60vh' }}>
     <Scrollbar
       ref={containerRef}
       style={{ width: '100%', height: '60vh' }}
@@ -98,6 +101,18 @@ function MessagesArea({ messages, isLoading }) {
       {messages.map((message) => (<MessageItem key={message.id} message={message} />))}
       </div>
     </Scrollbar>
+    {isLoading && (
+        // <div className="fixed bottom-32 left-1/2 transform -translate-x-1/2">
+        <div style={{
+          position: 'absolute', // or 'fixed'
+          bottom: '20%',
+          left: 0,
+          zIndex: 1000
+        }}>
+        <ThinkingAnimation/>
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -198,7 +213,7 @@ export default function AskAI({ blogContent }) {
 
     const chatHook = useChat({
         api: "/api/chat",
-        body: { context: blogContent },
+        body: { context: blogContent,option:'ask-blog' },
     });
 
     if (!mounted) return null;

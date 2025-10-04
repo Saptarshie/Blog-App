@@ -13,9 +13,12 @@
   
 
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect,useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { fetchBlogs } from '@/action/blogAction';
+import CreatorBlogCard from '@/components/cards/CreatorBlogCard';
+import Loading from '../loading';
 // import { getServerSideProps } from './get-server-side-prop';
 // You'll need to install these if you don't have them:
 // npm install @heroicons/react
@@ -36,7 +39,9 @@ export default function CreatorDashboard({ initialData }) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [activeTab, setActiveTab] = useState('dashboard');
   const router = useRouter();
-  
+  const [BlogDetails, setBlogDetails] = useState([]);
+  const [BlogsLoading, setBlogsLoading] = useState(true);
+  const [error, setError] = useState(null);
   // For client-side rendering
   useEffect(() => {
     const fetchData = async () => {
@@ -48,6 +53,8 @@ export default function CreatorDashboard({ initialData }) {
           const res = await fetchUserAction();
           if (res.success) {
             setUser(res.user);
+            console.log("Fetched user data:", res.user);
+            setBlogsLoading(true);
           }
         }
       } catch (error) {
@@ -57,7 +64,52 @@ export default function CreatorDashboard({ initialData }) {
     
     fetchData();
   }, [initialData]);
+  useEffect(() => {
+    const getBlogDetails = async () => {
+      console.log("getBlogDetails called ...");
+      // qwerty
+      if (user.blogs && user.blogs.length > 0) {
+        try {
+          const result = await fetchBlogs(1,3,{ ids: user.blogs.slice(-3) });
+          console.log("fetchBlogs result:", result);
+          if (result.success) {
+            setBlogDetails(result.blogs);
+            setError(null);
+          } else {
+            // Set an error message if the fetch fails
+            setError(result.message || 'Could not load blogs.');
+          }
+        } catch (err) {
+          setError('An unexpected error occurred.');
+          console.error("Error fetching result: ",err);
+        } finally {
+          setBlogsLoading(false);
+        }
+      }
+    };
+    getBlogDetails();
+  }, [user]);
 
+    const refreshBlogs = useCallback(() => {
+    setBlogsLoading(true);
+    // Reset blog data instead of mutating initialData
+    setBlogData({});
+    // Refetch blogs
+    fetchBlogs(filter={ ids: user.blogs }).then(result => {
+      if (result.success) {
+        setBlogDetails(result.blogs);
+      }
+      else {
+        setError(result.message || 'Could not load blogs.');
+      }
+      setBlogsLoading(false);
+    }).catch(err => {
+      setError('An unexpected error occurred.');
+      console.error(err);
+      setBlogsLoading(false);
+    });
+  }, [user]);
+  
   return (
     <>
     <div className="min-h-screen bg-gray-50 flex">
@@ -202,31 +254,29 @@ export default function CreatorDashboard({ initialData }) {
                 View all
               </Link>
             </div>
-            
-            {user.blogs && user.blogs.length > 0 ? (
-              <div className="divide-y divide-gray-200">
-                {user.blogs.slice(0, 5).map((blog, i) => (
-                  <div key={i} className="px-6 py-4">
-                    <h3 className="text-base font-medium text-gray-900">{blog.title}</h3>
-                    <p className="text-sm text-gray-500 mt-1">{blog.description}</p>
+              {user.blogs && user.blogs.length > 0 ? (
+                BlogsLoading ? (<div><Loading/></div>) : (<div className="divide-y divide-gray-200 ">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-1">
+                  {BlogDetails.slice(0, 5).map((blog) => (
+                    <CreatorBlogCard key={blog.id} blog={blog} refreshBlogs={refreshBlogs} />
+                  ))}
                   </div>
-                ))}
-              </div>
-            ) : (
-              <div className="px-6 py-12 text-center">
-                <div className="mx-auto w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                  <PlusCircleIcon className="h-12 w-12 text-gray-400" />
+                </div>)
+              ) : (
+                <div className="px-6 py-12 text-center">
+                  <div className="mx-auto w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                    <PlusCircleIcon className="h-12 w-12 text-gray-400" />
+                  </div>
+                  <h3 className="text-lg font-medium text-gray-900 mb-1">No blogs yet</h3>
+                  <p className="text-gray-500 mb-6">Start creating content to grow your audience</p>
+                  <button onClick={() => router.push('/creator-dashboard/create')}
+                    className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700">
+                    <PlusCircleIcon className="h-5 w-5 mr-2" />
+                    Create New Blog
+                  </button>
                 </div>
-                <h3 className="text-lg font-medium text-gray-900 mb-1">No blogs yet</h3>
-                <p className="text-gray-500 mb-6">Start creating content to grow your audience</p>
-                <button onClick={() => router.push('/creator-dashboard/create')}
-                  className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700">
-                  <PlusCircleIcon className="h-5 w-5 mr-2" />
-                  Create New Blog
-                </button>
-              </div>
-            )}
-          </div>
+              )}
+            </div>
         </main>
       </div>
     </div>

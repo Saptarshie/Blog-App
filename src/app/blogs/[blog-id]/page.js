@@ -6,11 +6,8 @@ import { formatDistanceToNow } from "date-fns";
 import BlogCard from "@/components/blog-feed/blog-card";
 import {SimilarBlogs,SimilarBlogsLoading} from "@/components/blog-feed/similar-blogs"
 import { Suspense } from "react";
-import AskAI from "@/components/ask-ai";
-import useReadAloud from "@/components/hooks/useReadAloud";
-import BlogReadAloud from "@/components/blog-read-aloud";
-import dynamic from "next/dynamic";
-// Dynamically import AskAI component to ensure it only renders on the client side
+import AskAIWrapper from "@/components/ask-ai/AskAIWrapper";
+import BlogReadAloudWrapper from "@/components/blog-read-aloud";
 
 
 export default async function BlogPage({ params }) {
@@ -46,8 +43,8 @@ export default async function BlogPage({ params }) {
   
   return (
     <>
-    <div className="absolute h-screen w-screen max-w-4xl mx-auto px-4 py-8 transform hover:scale-110 hover:translate-y-[-4px]">
-    < AskAI blogContent={blog?.content} />
+    <div className="absolute h-screen w-screen max-w-4xl mx-auto px-4 py-8 transform ">
+    < AskAIWrapper blogContent={blog?.content} />
     </div>
     <article className="max-w-4xl mx-auto px-4 py-8">
       {/* Blog Header */}
@@ -67,8 +64,8 @@ export default async function BlogPage({ params }) {
         </h1>
         {/* ------------------------------------ */}
         {/* Read-Aloud section */}
-        <div className="flex items-center mb-4">
-        <BlogReadAloud content={blog.content} />
+        <div className="flex items-center mb-4" style={{zIndex: 14000}}>
+        <BlogReadAloudWrapper content={blog.content} />
         </div>
         {/* ------------------------------------ */}
         <p className="text-xl text-gray-600 mb-6 leading-relaxed">

@@ -138,6 +138,11 @@ export async function fetchBlogs(page = 1, limit = 10, filters = {}) {
       query.isPremium = filters.isPremium;
     }
     
+    // Add filter for specific blog IDs
+    if (filters.ids && filters.ids.length > 0) {
+      query._id = { $in: filters.ids };
+    }
+    
     // Add filter for author
     if (filters.author) {
       query.author = filters.author;
