@@ -5,7 +5,6 @@ import { useChat } from "ai/react";
 import ReactMarkdown from 'react-markdown';
 import { createPortal } from "react-dom";
 import ThinkingAnimation from "./thinkingAnimation";
-// New Import
 import { Scrollbar } from 'react-scrollbars-custom'; 
 function MessageItem({ message }) {
     // Only process assistant messages for thoughts
@@ -100,6 +99,7 @@ function MessagesArea({ messages, isLoading }) {
       <div className="flex flex-col gap-5" style={{margin: '3%'}}>
       {messages.map((message) => (<MessageItem key={message.id} message={message} />))}
       </div>
+        <div style={{height: '46px'}}></div>
     </Scrollbar>
     {isLoading && (
         <div className="fixed bottom-32 left-0 transform -translate-x-1/2">
@@ -155,13 +155,12 @@ function ChatModal({ isOpen, onClose, chatHook }) {
                 </div>
 
                 {/* Chat Messages: Scrollable Area. Placed inside a flex-1 wrapper to take remaining space. */}
-                <div className="flex-1" style={{height: '60vh', overflow: 'hidden'}}>
+                <div className="flex-1 flex-wrap" style={{height: '60vh', overflow: 'hidden'}}>
                     <MessagesArea
                         messages={messages}
                         isLoading={isLoading}
                     />
                 </div>
-
                 {/* Input Form: Fixed height (shrink-0) */}
                 <form onSubmit={handleSubmit} className="p-4 border-t border-gray-100 shrink-0 " style={{backgroundColor: 'rgba(255, 255, 255, 0.6)'}}>
                     <div className="flex gap-2">

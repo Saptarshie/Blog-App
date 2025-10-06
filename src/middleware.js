@@ -6,7 +6,7 @@ export async function middleware(req) {
   const { setCookie } = await cookies();
   const { get } = await cookies();
   const token = await get("token");
-  const isPublicPath = pathname === "/authenticate/sign-up" || pathname === "/authenticate/sign-in";
+  const isPublicPath = pathname === "/authenticate/sign-up" || pathname === "/authenticate/sign-in" || pathname === "/authenticate/forgot-passward" || pathname.startsWith("/authenticate/reset-passward");
 
 
   if (!isPublicPath && (!token || token === "undefined"||token=="")){

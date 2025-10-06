@@ -7,12 +7,14 @@ import {User} from "@/models";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { cookies } from "next/headers";
+import nodemailer from "nodemailer";
 const Joi = require('joi');
 // Define validation schema
 const SignUpSchema = Joi.object({
   username: Joi.string().min(2).max(50).required(),
   email: Joi.string().email().required(),
-  password: Joi.string().min(8).required()
+  password: Joi.string().min(8).required(),
+  otp: Joi.string().length(6).required()
 });
 export async function SignUpAction(data){
     console.log(data);
@@ -35,6 +37,13 @@ export async function SignUpAction(data){
             };
         }
         console.log(data);
+        if(!global.otpStore || !global.otpStore[data.email] || global.otpStore[data.email].otp !== data.otp){
+            return {
+                success: false,
+                status: 400,
+                message: "Invalid OTP",
+            };
+        }
         const {password} = data;
         const user = await User.create({
             username: data.username,
@@ -81,7 +90,14 @@ export async function SignInAction(data){
         }
         const jwt_secret = process.env.JWT_SECRET||"secret";
         const token = jwt.sign({ id: user._id, username: user.username, email: user.email}, jwt_secret, { expiresIn: "1d" });
-        cookies().set("token", token);
+        const cookieStore = await cookies(); // ✅ await the cookies() call
+        cookieStore.set("token", token, {
+                httpOnly: true,                  // prevent client-side JS access
+                secure: process.env.NODE_ENV === "production", // only HTTPS in prod
+                sameSite: "strict",              // CSRF protection
+                path: "/",                       // cookie valid for whole site
+                maxAge: 60 * 60 * 24,            // 1 day in seconds
+            });
         return {
             success: true,
             status: 200,
@@ -116,6 +132,55 @@ export async function SignOutAction(){
     }
 }
 
+export async function sendOtp(email){
+
+  // Generate OTP
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+  // Store OTP in memory, Redis, or DB with expiry (e.g., 5 min)
+  // For demo: store in-memory (NOT for production)
+  global.otpStore = global.otpStore || {};
+  global.otpStore[email] = { otp, expires: Date.now() + 5 * 60 * 1000 };
+
+  // Send email
+  const transporter = nodemailer.createTransport({
+    service: "Gmail",
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS,
+    },
+  });
+  try {
+    await transporter.sendMail({
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: "Your OTP Code",
+      text: `Your OTP is ${otp}. It expires in 5 minutes.`,
+    });
+
+    return { success: true, message: "OTP sent" };
+  } catch (error) {
+    console.error("Error sending email:", error);
+    return { success: false, error: error.message }
+  }
+}
+
+export async function verifyOtp(email, otp) {
+    const record = global.otpStore?.[email];
+  if (!record) {
+    return { success: false, message: "No OTP found" };
+  }
+
+  if (record.expires < Date.now()) {
+    return { success: false, message: "OTP expired" };
+  }
+
+  if (record.otp !== otp) {
+    return { success: false, message: "Invalid OTP" };
+  }
+  return { success: true, message: "OTP verified" };
+}
+
 export async function fetchUserAction(){
     try{
         const db = await connectToDB();
@@ -144,6 +209,42 @@ export async function fetchUserAction(){
             status: 200,
             message: "User fetched successfully",
             user: JSON.parse(JSON.stringify(user)),
+        }
+    }catch(error){
+        console.log(error);
+        return {
+            success: false,
+            status: 500,
+            message: error.message,
+        }
+    }
+}
+
+export async function ResetPasswordAction(email, otp, newPassword){
+    const isVerified = await verifyOtp(email, otp);
+    if(!isVerified.success){
+        return {
+            success: false,
+            status: 400,
+            message: isVerified.message,
+        }
+    }
+    try{
+        const db = await connectToDB();
+        const user = await User.findOne({email});
+        if(!user){
+            return {
+                success: false,
+                status: 400,
+                message: "User not found",
+            }
+        }
+        user.password = bcrypt.hashSync(newPassword, 10);
+        await user.save();
+        return {
+            success: true,
+            status: 200,
+            message: "Password reset successfully",
         }
     }catch(error){
         console.log(error);

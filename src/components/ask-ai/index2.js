@@ -4,8 +4,71 @@ import React , { useRef, useState, useEffect } from "react";
 import { useChat } from "ai/react";
 import ReactMarkdown from 'react-markdown';
 import { createPortal } from "react-dom";
+import ThinkingAnimation from "./thinkingAnimation";
 // New Import
 import { Scrollbar } from 'react-scrollbars-custom'; 
+function MessageItem({ message }) {
+    // Only process assistant messages for thoughts
+    const isAssistant = message.role !== "user";
+
+    // 1. REGEX to extract the thought text
+    const thoughtMatch = isAssistant 
+        ? message.content.match(/<think>(.*?)<\/think>/s) 
+        : null;
+    
+    // Extracted thought (if present), or null
+    const thoughtText = thoughtMatch ? thoughtMatch[1].trim() : null;
+
+    // Response text without the thought tags
+    const responseText = isAssistant && thoughtMatch 
+        ? message.content.replace(/<think>.*?<\/think>/s, '').trim()
+        : message.content;
+
+    // 2. State is now safely inside the component function
+    const [isThoughtOpen, setIsThoughtOpen] = useState(false);
+
+    return (
+        <div 
+          key={message.id} 
+          className={`flex mb-3 ${message.role === "user" ? "justify-end" : "justify-start"}`}
+        >
+            <div className={`max-w-[70%] ${message.role === "user" ? "" : "w-full"}`}>
+
+                {/* --- 3. Collapsable Thought Area (Rendered only for assistant) --- */}
+                {isAssistant && thoughtText && (
+                    <div className="mb-2 p-2 border border-yellow-400 bg-yellow-50 rounded-lg shadow-sm">
+                        <button
+                            onClick={() => setIsThoughtOpen(!isThoughtOpen)}
+                            className="w-full text-left text-xs font-semibold text-yellow-800 flex justify-between items-center"
+                        >
+                            <span className="flex items-center">
+                                {isThoughtOpen ? '▼' : '▶'} AI Thought Process
+                            </span>
+                        </button>
+                        {isThoughtOpen && (
+                            <div className="mt-1 pt-1 border-t border-yellow-200 text-xs text-yellow-700 whitespace-pre-wrap">
+                                {thoughtText}
+                            </div>
+                        )}
+                    </div>
+                )}
+                {/* --- End Collapsable Thought Area --- */}
+
+                {/* The main chat bubble */}
+                <div
+                    className={`px-4 py-3 rounded-xl text-sm shadow-sm ${
+                        message.role === "user"
+                            ? "bg-blue-600 text-white rounded-br-none"
+                            : "bg-gradient-to-bl text-gray-700 rounded-bl-none shadow-blue-950 shadow-2xl"
+                    }`}
+                >
+                    {/* Render the remaining response text */}
+                    <div><ReactMarkdown>{responseText}</ReactMarkdown></div>
+                </div>
+            </div>
+        </div>
+    );
+}
 
 function MessagesArea({ messages, isLoading }) {
   const containerRef = useRef(null);
@@ -18,16 +81,13 @@ function MessagesArea({ messages, isLoading }) {
   }, [messages, isLoading]);
 
   return (
-    // FINAL FIX: Using the Scrollbar Component
-    // The Scrollbar component is placed inside the flex-1 area of the parent,
-    // and handles the internal scrolling logic reliably.
+    // The Scrollbar container already has padding and vertical space (p-4 space-y-3)
+    <div style={{ width: '100%', height: '60vh' }}>
     <Scrollbar
-      // We pass the ref to the Scrollbar component
       ref={containerRef}
-      style={{ width: '100%', height: '60vh' }} // Ensures it fills its parent flex container
-      className="p-4 space-y-3"
-      // Remove all conflicting scroll-related CSS from the child div
-      // The content wrapper inside Scrollbar will handle the messages
+      style={{ width: '100%', height: '60vh' }}
+      // CRITICAL: Ensure the Scrollbar has internal padding (p-4) and spacing between items (space-y-3)
+      className="p-4 space-y-3" 
     >
       {messages.length === 0 && (
         <div className="text-center text-gray-400 mt-8">
@@ -37,36 +97,23 @@ function MessagesArea({ messages, isLoading }) {
           <p className="text-sm">Ask anything about this blog!</p>
         </div>
       )}
-
-      {messages.map((message) => (
-        <>
-        <div key={message.id} className={`flex gap-7 m-5 ${message.role === "user" ? "justify-end" : "justify-start"}`}>
-          <div
-            className={`max-w-[70%] px-3 py-2 rounded-xl text-sm m-1.5 p-3.5 ${
-              message.role === "user"
-                ? "bg-blue-500 text-white rounded-br-sm"
-                : "bg-gray-100 text-gray-700 rounded-bl-sm"
-            }`}
-          >
-            <div><ReactMarkdown>{message.content}</ReactMarkdown></div>
-          </div>
+      <div className="flex flex-col gap-5" style={{margin: '3%'}}>
+      {messages.map((message) => (<MessageItem key={message.id} message={message} />))}
+      </div>
+    </Scrollbar>
+    {isLoading && (
+        <div className="fixed bottom-32 left-0 transform -translate-x-1/2">
+        <div style={{
+          position: 'absolute', // or 'fixed'
+          bottom: '20%',
+          left: 0,
+          zIndex: 1000,
+        }}>
+        <ThinkingAnimation/>
         </div>
-        <p><br/></p>
-        </>
-      ))}
-
-      {isLoading && (
-        <div className="flex justify-start">
-          <div className="bg-gray-100 px-3 py-2 rounded-xl rounded-bl-sm">
-            <div className="flex space-x-1">
-              <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce"></div>
-              <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "0.1s" }}></div>
-              <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "0.2s" }}></div>
-            </div>
-          </div>
         </div>
       )}
-    </Scrollbar>
+    </div>
   );
 }
 
@@ -88,11 +135,11 @@ function ChatModal({ isOpen, onClose, chatHook }) {
                    - h-[90vh]: Gives the container a fixed height.
                    - overflow-hidden: MUST be present to contain the scroll.
                 */
-                className="bg-white/70 rounded-2xl w-full max-w-lg shadow-2xl transform transition-all duration-300 scale-100 hover:scale-[1.02] h-[90vh] flex flex-col overflow-hidden" 
+                className="bg-white/70 rounded-4xl w-full max-w-lg shadow-2xl transform transition-all duration-300 scale-100 hover:scale-[1.02] h-[68vh] flex flex-col overflow-hidden" 
                 style={{ backdropFilter: "blur(5px)", backgroundColor: "rgba(112,226,178, 0.7)" }}
             >
                 {/* Header: Fixed height (shrink-0) */}
-                <div className="flex justify-between items-center p-4 border-b border-gray-100 shrink-0 bg-white">
+                <div className="flex justify-between items-center p-4 border-b border-gray-100 shrink-0 bg-yellow " style={{backgroundColor: 'rgba(255, 255, 255, 0.6)'}}>
                     <div className="flex items-center gap-2">
                         <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
                         <h2 className="text-lg font-semibold text-gray-800">Ask AI</h2>
@@ -108,7 +155,7 @@ function ChatModal({ isOpen, onClose, chatHook }) {
                 </div>
 
                 {/* Chat Messages: Scrollable Area. Placed inside a flex-1 wrapper to take remaining space. */}
-                <div className="flex-1 min-h-0">
+                <div className="flex-1" style={{height: '60vh', overflow: 'hidden'}}>
                     <MessagesArea
                         messages={messages}
                         isLoading={isLoading}
@@ -116,7 +163,7 @@ function ChatModal({ isOpen, onClose, chatHook }) {
                 </div>
 
                 {/* Input Form: Fixed height (shrink-0) */}
-                <form onSubmit={handleSubmit} className="p-4 border-t border-gray-100 shrink-0 bg-white">
+                <form onSubmit={handleSubmit} className="p-4 border-t border-gray-100 shrink-0 " style={{backgroundColor: 'rgba(255, 255, 255, 0.6)'}}>
                     <div className="flex gap-2">
                         <input
                             value={input}
@@ -167,7 +214,7 @@ export default function AskAI({ blogContent }) {
 
     const chatHook = useChat({
         api: "/api/chat",
-        body: { context: blogContent },
+        body: { context: blogContent,option:'ask-blog' },
     });
 
     if (!mounted) return null;

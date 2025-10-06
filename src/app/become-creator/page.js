@@ -52,7 +52,7 @@ export default function BecomeCreator() {
                             id="wallet"
                             value={walletAddress}
                             onChange={(e) => {setWalletAddress(e.target.value);setIsValidWallet(!!isValidWalletAddress(e.target.value))}}
-                            placeholder="Enter your blockchain wallet address"
+                            placeholder="Enter your crypto wallet address"
                             className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 
                             focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                             required

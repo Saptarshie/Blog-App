@@ -102,7 +102,12 @@ export default function SignIn() {
               placeholder="Create a secure password"
               minLength="8"
             />
-            <p className="mt-1 text-xs text-gray-500">Must be at least 8 characters</p>
+            <div className="flex justify-between items-center mt-1">
+            <p className="text-xs text-gray-500">Must be at least 8 characters</p>
+            <Link href="/authenticate/forgot-passward" className="text-xs text-blue-600 hover:text-blue-800 font-medium">
+              <u>forgot password?</u>
+            </Link>
+  </div>
           </div>
           
           <button

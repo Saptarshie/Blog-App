@@ -151,7 +151,7 @@ export async function updateUserSettings(data) {
 }
 
 // Helper function to validate email
-function isValidEmail(email) {
+export async function isValidEmail(email) {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return emailRegex.test(email);
 }
