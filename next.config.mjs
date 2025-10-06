@@ -18,9 +18,26 @@ const nextConfig = {
       allowedOrigins: ['localhost:3000', 'n2g9pcp2-3000.inc1.devtunnels.ms'],
     },
   },
-  images: {
-    domains: ['localhost','res.cloudinary.com'], 
-  },
+images: {
+    remotePatterns: [
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+        port: '**',      // allow any port (e.g. 3000, 4000)
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'localhost',
+        port: '**',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'res.cloudinary.com',
+        pathname: '/**',
+      },
+    ]},
   // Ensure public directory is properly served
   assetPrefix: '',
   // Add webpack configuration here

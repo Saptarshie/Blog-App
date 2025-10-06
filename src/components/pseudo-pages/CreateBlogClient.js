@@ -97,7 +97,7 @@ export default function CreateBlog({ AddBlog, initialData = {
           if (line.startsWith('0:')) {
             const chunkText = line.substring(2).replace(/"/g, '');
             fullResponse += chunkText;
-            updateState(fullResponse); // Update state with the accumulating response
+            updateState(fullResponse.replace(/<think>.*?<\/think>/s, '').trim()); // Update state with the accumulating response
           }
         }
       }

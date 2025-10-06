@@ -43,9 +43,9 @@ export default async function BlogPage({ params }) {
   
   return (
     <>
-    <div className="absolute h-screen w-screen max-w-4xl mx-auto px-4 py-8 transform ">
+    {/* <div className="absolute h-screen w-screen max-w-4xl mx-auto px-4 py-8 transform "> */}
     < AskAIWrapper blogContent={blog?.content} />
-    </div>
+    {/* </div> */}
     <article className="max-w-4xl mx-auto px-4 py-8">
       {/* Blog Header */}
       <header className="mb-8">

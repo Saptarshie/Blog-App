@@ -102,14 +102,15 @@ function MessagesArea({ messages, isLoading }) {
       </div>
     </Scrollbar>
     {isLoading && (
-        // <div className="fixed bottom-32 left-1/2 transform -translate-x-1/2">
+        <div className="fixed bottom-32 left-0 transform -translate-x-1/2">
         <div style={{
           position: 'absolute', // or 'fixed'
           bottom: '20%',
           left: 0,
-          zIndex: 1000
+          zIndex: 1000,
         }}>
         <ThinkingAnimation/>
+        </div>
         </div>
       )}
     </div>
@@ -134,7 +135,7 @@ function ChatModal({ isOpen, onClose, chatHook }) {
                    - h-[90vh]: Gives the container a fixed height.
                    - overflow-hidden: MUST be present to contain the scroll.
                 */
-                className="bg-white/70 rounded-4xl w-full max-w-lg shadow-2xl transform transition-all duration-300 scale-100 hover:scale-[1.02] h-[90vh] flex flex-col overflow-hidden" 
+                className="bg-white/70 rounded-4xl w-full max-w-lg shadow-2xl transform transition-all duration-300 scale-100 hover:scale-[1.02] h-[68vh] flex flex-col overflow-hidden" 
                 style={{ backdropFilter: "blur(5px)", backgroundColor: "rgba(112,226,178, 0.7)" }}
             >
                 {/* Header: Fixed height (shrink-0) */}
@@ -154,7 +155,7 @@ function ChatModal({ isOpen, onClose, chatHook }) {
                 </div>
 
                 {/* Chat Messages: Scrollable Area. Placed inside a flex-1 wrapper to take remaining space. */}
-                <div className="flex-1 min-h-0">
+                <div className="flex-1" style={{height: '60vh', overflow: 'hidden'}}>
                     <MessagesArea
                         messages={messages}
                         isLoading={isLoading}

@@ -4,16 +4,14 @@ import useReadAloud from "@/components/hooks/useReadAloud";
 import { stripHtmlForReadAloud } from "./stripHtmlForReadAloud";
 
 export default function BlogReadAloud({ content }) {
-    console.log("BlogReadAloud rendered with content length:", content.length);
     content = stripHtmlForReadAloud(content);
-    console.log("Stripped content length:", content.length);
     const { isSpeaking, speak, stop , voices} = useReadAloud();
     console.log(voices);
     return (
         <div className="flex items-center gap-4 mb-6">
         <button
-            onClick={() => {console.log("Button clicked. isSpeaking:", isSpeaking); (isSpeaking ? stop() : speak(content)); }}
-            className="flex items-center gap-2 px-4 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 rounded-lg transition-colors" id="read-aloud-button"
+            onClick={() => (isSpeaking ? stop() : speak(content))}
+            className="flex items-center gap-2 px-4 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 rounded-lg transition-colors"
         >
             {isSpeaking ? (
             <>
